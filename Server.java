@@ -60,8 +60,10 @@ public class Server
         	 * If we got a new client, add them to the vector
         	 */
         	
-        	if (client != null)
+        	if (client != null){
         		clients.add (client);
+                sendMenu(client);
+		} 
         	
         	/*
         	 * Then give all older clients a chance to do something.
@@ -137,19 +139,21 @@ public class Server
 	    return true;
     }
 
-    private void sendMenu(Socket client) {
+private void sendMenu(Socket client) {
     try {
         PrintWriter outToClient = new PrintWriter(client.getOutputStream(), true);
         String menu = "Menu:\n" +
-                      "1. Item 1\n" +
-                      "2. Item 2\n" +
-                      "3. Item 3\n" +
-                      "4. Item 4\n";
+                      "1. Set Username\n" +
+                      "2. Look for game\n" +
+                      "3. Disconnect\n";                
         outToClient.println(menu);
     } catch (IOException e) {
         e.printStackTrace();
     }
 }
+
+
+
 
 }
 
