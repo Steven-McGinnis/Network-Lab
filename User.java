@@ -4,8 +4,7 @@ public class User {
     private String username;
     private Socket socket;
     
-    public User(String username, Socket socket) {
-        this.username = username;
+    public User(Socket socket) {
         this.socket = socket;
     }
     
@@ -15,5 +14,9 @@ public class User {
     
     public Socket getSocket() {
         return socket;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
     }
 }

@@ -48,13 +48,10 @@ public class Server {
              */
 
             if (client != null) {
-                String username = receiveUsername(client);
-                if (username != null) {
-                    User user = new User(username, client);
-					System.out.println(user.getSocket());
-                    clients.add(user);
-                    sendMenu(user);
-                }
+                User user = new User(client);
+				System.out.println(user.getSocket());
+                clients.add(user);
+                sendMenu(user); 
             }
 
             /*
