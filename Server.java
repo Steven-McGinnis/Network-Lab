@@ -1,10 +1,19 @@
-import java.io.*;
-import java.net.*;
-import java.util.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.net.SocketTimeoutException;
+import java.util.ArrayList;
+import java.util.Queue;
+import java.util.LinkedList;
+
 
 public class Server {
 
   private ArrayList<User> clients = new ArrayList<User>();
+  private Queue<User> waitList = new LinkedList<User>();
 
   public static void main(String[] args) {
     Server server = new Server();
@@ -104,7 +113,21 @@ public class Server {
         }
 
         input = inFromClient.readLine();
-        System.out.println(input);
+
+        if(input.equals("cmdStartGame")){
+          if (waitList.size() >= 2) {
+            //startGame(waitList);
+                        outToClient.println(
+              "Game Start"
+            );
+          } else {
+            waitList.add(user);
+            outToClient.println(
+              "You are now waiting for another player to join the game."
+            );
+          }
+        }
+
         if (input.equals("cmdGetUsers")) {
           if (clients.size() > 0) {
             String usernames = "Logged in users: ";

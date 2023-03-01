@@ -41,9 +41,12 @@ public class Client {
       System.out.println("1: Start a Game");
       System.out.println("2: See all players online.");
       System.out.println("3: Quit");
+      
       userInput = stdIn.readLine();
+
       if (userInput.equals("1")) {
-        outToServer.println(userInput);
+        outToServer.println("cmdStartGame");
+        System.out.println ("Server: " + inFromServer.readLine ());
       } else if (userInput.equals("2")) {
         outToServer.println("cmdGetUsers");
         System.out.println ("Server: " + inFromServer.readLine ());
