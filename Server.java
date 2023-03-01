@@ -116,6 +116,14 @@ public class Server
 	    {
 	    	if (inFromClient.ready ())
 	    	{
+				User user = getUserBySocket(client);
+				if (user.getUsername() == null) {
+					user.setUsername(inFromClient.readLine());
+					System.out.println("Successfully Set Username to " + user.getUsername());
+					outToClient.println("Successfully Set Username to " + user.getUsername());
+					
+				}
+				
 	    		input = inFromClient.readLine ();
 	    		outToClient.println (input.toUpperCase ());
 	    	}
@@ -136,4 +144,13 @@ public class Server
 	    
 	    return true;
     }
+
+	private User getUserBySocket(Socket socket) {
+		for (User user : clients) {
+			if (user.getSocket() == socket) {
+				return user;
+			}
+		}
+		return null;
+	}
 }
