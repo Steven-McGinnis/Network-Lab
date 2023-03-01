@@ -75,8 +75,8 @@ public class Server
         	int i = 0;
 			while (i < clients.size ()) {
 				if (processClientInput ((Socket) clients.get(i).getSocket ()))
-					i++;
-			}
+        			i++;
+        	}
         	
         } while (true);
 	

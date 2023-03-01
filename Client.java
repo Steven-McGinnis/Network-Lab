@@ -1,10 +1,13 @@
 import java.io.*;
 import java.net.*;
 
+
 public class Client 
 {
+  
   public static void main(String[] args) throws IOException 
   {
+    String Name = null;
     Socket server = null;
     PrintWriter outToServer = null;
     BufferedReader inFromServer = null;
@@ -28,9 +31,19 @@ public class Client
 
     BufferedReader stdIn = new BufferedReader(new InputStreamReader(System.in));
     String userInput;
-    System.out.println("WHOAMI?");
+
     do
     {
+      if(Name == null ){
+        System.out.println("Please Enter your Name.");
+        userInput = stdIn.readLine();
+        Name = userInput;
+        outToServer.println(userInput);
+        System.out.println("Hello " + Name);
+        inFromServer.readLine();
+      }
+
+      
       userInput = stdIn.readLine();
       outToServer.println(userInput);
       System.out.println ("Server: " + inFromServer.readLine ());
