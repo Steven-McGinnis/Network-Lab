@@ -6,9 +6,8 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
 import java.util.ArrayList;
-import java.util.Queue;
 import java.util.LinkedList;
-
+import java.util.Queue;
 
 public class Server {
 
@@ -113,20 +112,31 @@ public class Server {
         }
 
         input = inFromClient.readLine();
+     
+        if (input.equals("cmdStartGame")) {
+        // Add the user to the waitlist
+        waitList.add(user);
 
-        if(input.equals("cmdStartGame")){
-          if (waitList.size() >= 2) {
-            //startGame(waitList);
-                        outToClient.println(
-              "Game Start"
-            );
-          } else {
-            waitList.add(user);
-            outToClient.println(
-              "You are now waiting for another player to join the game."
-            );
-          }
+        // Check if there are at least two players in the waitlist
+        if (waitList.size() >= 2) {
+          // Create a new TicTacToeGame with the first two players in the waitlist
+          User player1 = waitList.remove();
+          User player2 = waitList.remove();
+          //TicTacToeGame game = new TicTacToeGame(player1, player2);
+
+          // Send "Game Start" message to both players
+          PrintWriter outToPlayer1 = new PrintWriter(player1.getSocket().getOutputStream(), true);
+          outToPlayer1.println("Game Start");
+          outToPlayer1.println("You are now in a game.");
+
+          PrintWriter outToPlayer2 = new PrintWriter(player2.getSocket().getOutputStream(), true);
+          outToPlayer2.println("Game Start");
+          outToPlayer2.println("You are now in a game.");
+        } else {
+          outToClient.println("You are now waiting for another player to join the game.");
         }
+      }
+
 
         if (input.equals("cmdGetUsers")) {
           if (clients.size() > 0) {
@@ -141,6 +151,13 @@ public class Server {
           }
         }
 
+        if (input.equals("cmdExitServer")) {
+          outToClient.println("Goodbye!");
+          clients.remove(user);
+          waitList.remove(user);
+          return false;
+        }
+
         outToClient.println(input.toUpperCase());
       }
     } catch (Exception e) {
@@ -151,7 +168,7 @@ public class Server {
        *
        */
 
-      clients.remove(client);
+      clients.removeIf(user -> user.getSocket().equals(client));
       e.printStackTrace();
       return false;
     }

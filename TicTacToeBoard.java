@@ -1,71 +1,101 @@
 public class TicTacToeBoard {
     private char[][] board;
-    
+    private char currentPlayerMark;
+
     public TicTacToeBoard() {
         board = new char[3][3];
+        currentPlayerMark = 'X';
+        initializeBoard();
+    }
+
+    public void initializeBoard() {
+        // Fill the board with empty spaces
         for (int i = 0; i < 3; i++) {
             for (int j = 0; j < 3; j++) {
-                board[i][j] = ' ';
+                board[i][j] = '-';
             }
         }
     }
-    
-    public boolean isValidMove(int row, int col) {
-        return (row >= 0 && row < 3 && col >= 0 && col < 3 && board[row][col] == ' ');
+
+    public void printBoard() {
+        System.out.println("-------------");
+
+        for (int i = 0; i < 3; i++) {
+            System.out.print("| ");
+            for (int j = 0; j < 3; j++) {
+                System.out.print(board[i][j] + " | ");
+            }
+            System.out.println();
+            System.out.println("-------------");
+        }
     }
-    
-    public boolean isGameOver() {
-        return (getWinner() != ' ' || isBoardFull());
-    }
-    
+
     public boolean isBoardFull() {
+        // Check if the board is full
+        boolean isFull = true;
+
         for (int i = 0; i < 3; i++) {
             for (int j = 0; j < 3; j++) {
-                if (board[i][j] == ' ') {
-                    return false;
+                if (board[i][j] == '-') {
+                    isFull = false;
                 }
             }
         }
-        return true;
+
+        return isFull;
     }
-    
-    public char getWinner() {
-        // check rows
+
+    public boolean checkForWin() {
+        // Check the rows
         for (int i = 0; i < 3; i++) {
-            if (board[i][0] == board[i][1] && board[i][0] == board[i][2] && board[i][0] != ' ') {
-                return board[i][0];
+            if (checkRowCol(board[i][0], board[i][1], board[i][2]) == true) {
+                return true;
             }
         }
-        // check columns
-        for (int j = 0; j < 3; j++) {
-            if (board[0][j] == board[1][j] && board[0][j] == board[2][j] && board[0][j] != ' ') {
-                return board[0][j];
-            }
-        }
-        // check diagonals
-        if (board[0][0] == board[1][1] && board[0][0] == board[2][2] && board[0][0] != ' ') {
-            return board[0][0];
-        }
-        if (board[0][2] == board[1][1] && board[0][2] == board[2][0] && board[0][2] != ' ') {
-            return board[0][2];
-        }
-        return ' ';
-    }
-    
-    public void makeMove(int row, int col, char player) {
-        board[row][col] = player;
-    }
-    
-    public String toString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("   0 1 2\n");
+
+        // Check the columns
         for (int i = 0; i < 3; i++) {
-            sb.append(i + " ");
-            for (int j = 0; j < 3; j++) {
-                sb.append(" " + board[i][j]);
+            if (checkRowCol(board[0][i], board[1][i], board[2][i]) == true) {
+                return true;
             }
-            sb.append("\n");
         }
-        return sb.toString();
+
+        // Check the diagonals
+        if (checkRowCol(board[0][0], board[1][1], board[2][2]) == true) {
+            return true;
+        }
+        if (checkRowCol(board[0][2], board[1][1], board[2][0]) == true) {
+            return true;
+        }
+
+        return false;
+    }
+
+    public boolean checkRowCol(char c1, char c2, char c3) {
+        return (c1 != '-' && c1 == c2 && c2 == c3);
+    }
+
+    public void changePlayer() {
+        if (currentPlayerMark == 'X') {
+            currentPlayerMark = 'O';
+        } else {
+            currentPlayerMark = 'X';
+        }
+    }
+
+    public boolean placeMark(int row, int col) {
+        // Check if the given row and column are valid
+        if (row >= 0 && row < 3 && col >= 0 && col < 3) {
+            if (board[row][col] == '-') {
+                board[row][col] = currentPlayerMark;
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public char getCurrentPlayerMark() {
+        return currentPlayerMark;
     }
 }

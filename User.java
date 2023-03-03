@@ -3,54 +3,30 @@ import java.net.Socket;
 public class User {
     private String username;
     private Socket socket;
-    private Boolean inQueue = false;
-    private Boolean inGame = false;
+    private int status = 0;
+   
     
     public User(Socket socket) {
         this.socket = socket;
     }
     
     public String getUsername() {
-        return username;
+        return this.username;
     }
     
     public Socket getSocket() {
-        return socket;
+        return this.socket;
     }
 
     public void setUsername(String username) {
         this.username = username;
     }
 
-    public boolean getInQueue() {
-        return this.inQueue;
+    public void setStatus(int status){
+        this.status = status;
     }
 
-    public void setInQueue(){
-        if (this.inQueue == false){
-            this.inQueue = true;
-        }else if (this.inQueue == true){
-            this.inQueue = false;
-        }
-        else{
-            return;
-        }
-
-    }
-
-    public boolean getInGame() {
-        return this.inGame;
-    }
-
-    public void setInGame(){
-        if (this.inGame == false){
-            this.inGame = true;
-        }else if (this.inGame == true){
-            this.inGame = false;
-        }
-        else{
-            return;
-        }
-
+    public int getStatus() {
+        return this.status;
     }
 }
