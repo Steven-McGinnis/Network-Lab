@@ -6,13 +6,12 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
 import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.Queue;
 
 public class Server {
 
-  private ArrayList<User> clients = new ArrayList<User>();
-  private Queue<User> waitList = new LinkedList<User>();
+  ArrayList<User> clients = new ArrayList<User>();
+  ArrayList<User> waitlist = new ArrayList<User>();
+  ArrayList<TicTacToeBoard> games = new ArrayList<TicTacToeBoard>();
 
   public static void main(String[] args) {
     Server server = new Server();
@@ -96,69 +95,43 @@ public class Server {
         new BufferedReader(new InputStreamReader(client.getInputStream()));
       outToClient = new PrintWriter(client.getOutputStream(), true);
     } catch (Exception e) {
-      e.printStackTrace();
-      clients.remove(client);
+      // Find the User object associated with the disconnected client and remove it
+      for (int i = 0; i < clients.size(); i++) {
+        User u = clients.get(i);
+        if (u.getSocket() == client) {
+          clients.remove(i);
+          break;
+        }
+      }
       return false;
     }
 
     try {
       if (inFromClient.ready()) {
-        User user = getUserBySocket(client);
-        if (user.getUsername() == null) {
-          user.setUsername(inFromClient.readLine());
-          outToClient.println(
-            "Successfully Set Username to " + user.getUsername()
-          );
-        }
-
         input = inFromClient.readLine();
-     
-        if (input.equals("cmdStartGame")) {
-        // Add the user to the waitlist
-        waitList.add(user);
+        String inputArray[] = input.split(" ", 2);
+		String output = "";
 
-        // Check if there are at least two players in the waitlist
-        if (waitList.size() >= 2) {
-          // Create a new TicTacToeGame with the first two players in the waitlist
-          User player1 = waitList.remove();
-          User player2 = waitList.remove();
-          //TicTacToeGame game = new TicTacToeGame(player1, player2);
-
-          // Send "Game Start" message to both players
-          PrintWriter outToPlayer1 = new PrintWriter(player1.getSocket().getOutputStream(), true);
-          outToPlayer1.println("Game Start");
-          outToPlayer1.println("You are now in a game.");
-
-          PrintWriter outToPlayer2 = new PrintWriter(player2.getSocket().getOutputStream(), true);
-          outToPlayer2.println("Game Start");
-          outToPlayer2.println("You are now in a game.");
-        } else {
-          outToClient.println("You are now waiting for another player to join the game.");
-        }
-      }
-
-
-        if (input.equals("cmdGetUsers")) {
-          if (clients.size() > 0) {
-            String usernames = "Logged in users: ";
-            for (User loggedInUser : clients) {
-              usernames += loggedInUser.getUsername() + ", ";
+        switch (inputArray[0]) {
+          case "IAM":
+            for (User user : clients) {
+              if (user.getSocket() == client) {
+                user.setUsername(inputArray[1]);
+				output = "NAMEOK";
+				outToClient.println(output);
+                break;
+              }
             }
-            outToClient.println(usernames);
-          } else {
-            String noUsers = "There are no users logged in.";
-            outToClient.println(noUsers.toUpperCase());
-          }
+            break;
+			case "USERS":
+			String userList = "USERS ";
+			for(User user : clients){
+				userList = userList + user.getUsername() + "\n";
+			}
+			userList += "--end--\n";
+			outToClient.println(userList);
+			break; 
         }
-
-        if (input.equals("cmdExitServer")) {
-          outToClient.println("Goodbye!");
-          clients.remove(user);
-          waitList.remove(user);
-          return false;
-        }
-
-        outToClient.println(input.toUpperCase());
       }
     } catch (Exception e) {
       /*
@@ -168,20 +141,16 @@ public class Server {
        *
        */
 
-      clients.removeIf(user -> user.getSocket().equals(client));
-      e.printStackTrace();
+      for (int i = 0; i < clients.size(); i++) {
+        User u = clients.get(i);
+        if (u.getSocket() == client) {
+          clients.remove(i);
+          break;
+        }
+      }
       return false;
     }
 
     return true;
-  }
-
-  private User getUserBySocket(Socket socket) {
-    for (User user : clients) {
-      if (user.getSocket() == socket) {
-        return user;
-      }
-    }
-    return null;
   }
 }
