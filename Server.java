@@ -110,27 +110,29 @@ public class Server {
       if (inFromClient.ready()) {
         input = inFromClient.readLine();
         String inputArray[] = input.split(" ", 2);
-		String output = "";
+        String output = "";
 
         switch (inputArray[0]) {
           case "IAM":
             for (User user : clients) {
               if (user.getSocket() == client) {
                 user.setUsername(inputArray[1]);
-				output = "NAMEOK";
-				outToClient.println(output);
+                output = "NAMEOK";
+                outToClient.println(output);
                 break;
               }
             }
             break;
-			case "USERS":
-			String userList = "USERS ";
-			for(User user : clients){
-				userList = userList + user.getUsername() + "\n";
-			}
-			userList += "--end--\n";
-			outToClient.println(userList);
-			break; 
+          case "USERS":
+            String userList = "USERS\n";
+            for (User user : clients) {
+              userList = userList + user.getUsername() + "\n";
+            }
+            userList += "--end--\n";
+            outToClient.println(userList);
+            break;
+          case "IAMGONE":
+            break;
         }
       }
     } catch (Exception e) {

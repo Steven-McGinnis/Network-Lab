@@ -52,6 +52,7 @@ public class Client {
         }
       }
 
+      userInput = "";
       //Main Menu
       if (status == 1) {
         System.out.println("What would you like to do?");
@@ -75,8 +76,6 @@ public class Client {
               returned += line + "\n";
             }
             System.out.println(returned);
-            System.out.println("--end--");
-            inFromServer.readLine();
             break;
           case "3":
             userInput = "IAMGONE";
@@ -86,10 +85,6 @@ public class Client {
             break;
         }
       }
-
-      userInput = stdIn.readLine();
-      outToServer.println(userInput);
-      System.out.println("Server: " + inFromServer.readLine());
     } while (!userInput.equals("Bye"));
 
     outToServer.close();
