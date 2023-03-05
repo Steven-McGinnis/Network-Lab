@@ -132,6 +132,13 @@ public class Server {
             outToClient.println(userList);
             break;
           case "IAMGONE":
+            for (int i = 0; i < clients.size(); i++) {
+              User u = clients.get(i);
+              if (u.getSocket() == client) {
+                clients.remove(i);
+                break;
+              }
+            }
             break;
         }
       }
