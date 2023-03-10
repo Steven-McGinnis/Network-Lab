@@ -4,6 +4,7 @@ public class User {
     private String username;
     private Socket socket;
     private int status = 0;
+    private char piece;
    
     
     public User(Socket socket) {
@@ -28,5 +29,13 @@ public class User {
 
     public int getStatus() {
         return this.status;
+    }
+
+    public void setPiece(char piece){
+        this.piece = piece;
+    }
+
+    public char getPiece() {
+        return this.piece;
     }
 }

@@ -114,12 +114,18 @@ public class Server {
 
         switch (inputArray[0]) {
           case "IAM":
+            Boolean name = isNameTaken(inputArray[1]);
             for (User user : clients) {
-              if (user.getSocket() == client) {
-                user.setUsername(inputArray[1]);
-                output = "NAMEOK";
+              if (name == false) {
+                if (user.getSocket() == client) {
+                  user.setUsername(inputArray[1]);
+                  output = "NAMEOK";
+                  outToClient.println(output);
+                  break;
+                }
+              } else {
+                output = "NAMEERROR";
                 outToClient.println(output);
-                break;
               }
             }
             break;
@@ -137,6 +143,32 @@ public class Server {
               if (u.getSocket() == client) {
                 clients.remove(i);
                 break;
+              }
+            }
+            break;
+          case "FINDMATCH":
+            User user = null;
+            for (User u : clients) {
+              if (u.getSocket() == client) {
+                user = u;
+                break;
+              }
+            }
+            if (user != null) {
+              if (waitlist.size() > 0) {
+                // TODO: start game
+                User opponent = waitlist.get(0);
+                waitlist.remove(0);
+
+                TicTacToeBoard game = new TicTacToeBoard(user, opponent);
+                String gameResponse =
+                  "MATCHFOUND " +
+                  opponent.getUsername() +
+                  " " +
+                  opponent.getPiece();
+                outToClient.println(gameResponse);
+              } else {
+                waitlist.add(user);
               }
             }
             break;
@@ -161,5 +193,19 @@ public class Server {
     }
 
     return true;
+  }
+
+  Boolean isNameTaken(String name) {
+    Boolean isTaken = false;
+    if (clients.isEmpty()) {
+      return false;
+    }
+    for (User user : clients) {
+      if (user.getUsername() != null && user.getUsername().equals(name)) {
+        isTaken = true;
+        break;
+      }
+    }
+    return isTaken;
   }
 }

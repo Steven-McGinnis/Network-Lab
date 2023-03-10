@@ -1,101 +1,122 @@
 public class TicTacToeBoard {
+    private static final int BOARD_SIZE = 3;
+  
+    private User player1;
+    private User player2;
     private char[][] board;
-    private char currentPlayerMark;
-
-    public TicTacToeBoard() {
-        board = new char[3][3];
-        currentPlayerMark = 'X';
-        initializeBoard();
-    }
-
-    public void initializeBoard() {
-        // Fill the board with empty spaces
-        for (int i = 0; i < 3; i++) {
-            for (int j = 0; j < 3; j++) {
-                board[i][j] = '-';
-            }
+    private User winner;
+  
+    public TicTacToeBoard(User player1, User player2) {
+      this.player1 = player1;
+      this.player2 = player2;
+      this.board = new char[BOARD_SIZE][BOARD_SIZE];
+      this.winner = null;
+  
+      // Initialize the board with empty spaces
+      for (int i = 0; i < BOARD_SIZE; i++) {
+        for (int j = 0; j < BOARD_SIZE; j++) {
+          board[i][j] = ' ';
         }
+      }
     }
-
-    public void printBoard() {
-        System.out.println("-------------");
-
-        for (int i = 0; i < 3; i++) {
-            System.out.print("| ");
-            for (int j = 0; j < 3; j++) {
-                System.out.print(board[i][j] + " | ");
-            }
-            System.out.println();
-            System.out.println("-------------");
-        }
+  
+    public boolean isGameOver() {
+      return getWinner() != null || isBoardFull();
     }
-
+  
     public boolean isBoardFull() {
-        // Check if the board is full
-        boolean isFull = true;
-
-        for (int i = 0; i < 3; i++) {
-            for (int j = 0; j < 3; j++) {
-                if (board[i][j] == '-') {
-                    isFull = false;
-                }
-            }
+      for (int i = 0; i < BOARD_SIZE; i++) {
+        for (int j = 0; j < BOARD_SIZE; j++) {
+          if (board[i][j] == ' ') {
+            return false;
+          }
         }
-
-        return isFull;
+      }
+      return true;
     }
-
-    public boolean checkForWin() {
-        // Check the rows
-        for (int i = 0; i < 3; i++) {
-            if (checkRowCol(board[i][0], board[i][1], board[i][2]) == true) {
-                return true;
-            }
-        }
-
-        // Check the columns
-        for (int i = 0; i < 3; i++) {
-            if (checkRowCol(board[0][i], board[1][i], board[2][i]) == true) {
-                return true;
-            }
-        }
-
-        // Check the diagonals
-        if (checkRowCol(board[0][0], board[1][1], board[2][2]) == true) {
-            return true;
-        }
-        if (checkRowCol(board[0][2], board[1][1], board[2][0]) == true) {
-            return true;
-        }
-
+  
+    public User getWinner() {
+      return winner;
+    }
+  
+    public void setWinner(User winner) {
+      this.winner = winner;
+    }
+  
+    public boolean isValidMove(int row, int col) {
+      return row >= 0 && row < BOARD_SIZE && col >= 0 && col < BOARD_SIZE && board[row][col] == ' ';
+    }
+  
+    public boolean makeMove(User player, int row, int col) {
+      if (!isValidMove(row, col)) {
         return false;
+      }
+  
+      char symbol = getSymbolForPlayer(player);
+      board[row][col] = symbol;
+  
+      if (hasPlayerWon(player)) {
+        setWinner(player);
+      }
+  
+      return true;
     }
-
-    public boolean checkRowCol(char c1, char c2, char c3) {
-        return (c1 != '-' && c1 == c2 && c2 == c3);
-    }
-
-    public void changePlayer() {
-        if (currentPlayerMark == 'X') {
-            currentPlayerMark = 'O';
-        } else {
-            currentPlayerMark = 'X';
+  
+    public boolean hasPlayerWon(User player) {
+      char symbol = getSymbolForPlayer(player);
+  
+      // Check rows
+      for (int i = 0; i < BOARD_SIZE; i++) {
+        boolean hasWon = true;
+        for (int j = 0; j < BOARD_SIZE; j++) {
+          if (board[i][j] != symbol) {
+            hasWon = false;
+            break;
+          }
         }
-    }
-
-    public boolean placeMark(int row, int col) {
-        // Check if the given row and column are valid
-        if (row >= 0 && row < 3 && col >= 0 && col < 3) {
-            if (board[row][col] == '-') {
-                board[row][col] = currentPlayerMark;
-                return true;
-            }
+        if (hasWon) {
+          return true;
         }
-
-        return false;
+      }
+  
+      // Check columns
+      for (int i = 0; i < BOARD_SIZE; i++) {
+        boolean hasWon = true;
+        for (int j = 0; j < BOARD_SIZE; j++) {
+          if (board[j][i] != symbol) {
+            hasWon = false;
+            break;
+          }
+        }
+        if (hasWon) {
+          return true;
+        }
+      }
+  
+      // Check diagonals
+      boolean hasWon = true;
+      for (int i = 0; i < BOARD_SIZE; i++) {
+        if (board[i][i] != symbol) {
+          hasWon = false;
+          break;
+        }
+      }
+      if (hasWon) {
+        return true;
+      }
+  
+      hasWon = true;
+      for (int i = 0; i < BOARD_SIZE; i++) {
+        if (board[i][BOARD_SIZE - i - 1] != symbol) {
+          hasWon = false;
+          break;
+        }
+      }
+      if (hasWon) {
+        return true;
+      }
+  
+      return false;
     }
-
-    public char getCurrentPlayerMark() {
-        return currentPlayerMark;
-    }
+  
 }

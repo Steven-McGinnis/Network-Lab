@@ -44,6 +44,7 @@ public class Client {
         userInput = "IAM " + userInput;
         outToServer.println(userInput);
         String result = inFromServer.readLine();
+        System.out.println(result);
         if (result.equals("NAMEERROR")) {
           break;
         } else if (result.equals("NAMEOK")) {
@@ -63,7 +64,8 @@ public class Client {
         userInput = stdIn.readLine();
         switch (userInput) {
           case "1":
-            break;
+            userInput = "FINDMATCH";
+            outToServer.println(userInput);
           case "2":
             userInput = "USERS";
             outToServer.println(userInput);
