@@ -32,6 +32,7 @@ public class Client {
     String userInput;
 
     do {
+      String returned;
       //Initial Connection
       if (status == 0) {
         System.out.println("What is your name?");
@@ -44,9 +45,8 @@ public class Client {
         userInput = "IAM " + userInput;
         outToServer.println(userInput);
         String result = inFromServer.readLine();
-        System.out.println(result);
         if (result.equals("NAMEERROR")) {
-          break;
+          System.out.println("Im Sorry that name has already been taken.");
         } else if (result.equals("NAMEOK")) {
           status = 1;
           System.out.println("Name Accepted");
@@ -66,10 +66,12 @@ public class Client {
           case "1":
             userInput = "FINDMATCH";
             outToServer.println(userInput);
+            returned = inFromServer.readLine();
+
           case "2":
             userInput = "USERS";
             outToServer.println(userInput);
-            String returned = "";
+            returned = "";
             String line = "";
             while ((line = inFromServer.readLine()) != null) {
               if (line.equals("--end--")) {
