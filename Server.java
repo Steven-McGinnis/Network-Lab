@@ -132,7 +132,10 @@ public class Server {
           case "USERS":
             String userList = "USERS\n";
             for (User user : clients) {
-              userList = userList + user.getUsername() + "\n";
+              String username = user.getUsername();
+              if (username != null) {
+                userList += username + "\n";
+              }
             }
             userList += "--end--\n";
             outToClient.println(userList);
@@ -159,14 +162,32 @@ public class Server {
                 // TODO: start game
                 User opponent = waitlist.get(0);
                 waitlist.remove(0);
+                user.setPiece('O');
+                opponent.setPiece('X');
 
-                TicTacToeBoard game = new TicTacToeBoard(user, opponent);
-                String gameResponse =
+               // TicTacToeBoard game = new TicTacToeBoard(user, opponent);
+                String gameResponse1 =
                   "MATCHFOUND " +
                   opponent.getUsername() +
                   " " +
                   opponent.getPiece();
-                outToClient.println(gameResponse);
+
+                  String gameResponse2 =
+                  "MATCHFOUND " +
+                  user.getUsername() +
+                  " " +
+                  user.getPiece();
+
+                // send the message to the current client
+                outToClient.println(gameResponse1);
+
+                // send the message to the opponent
+                PrintWriter opponentOut = new PrintWriter(
+                  opponent.getSocket().getOutputStream(),
+                  true
+                );
+                opponentOut.println(gameResponse2);
+                //TicTacToeBoard game = new TicTacToeBoard(user, opponent);
               } else {
                 waitlist.add(user);
               }

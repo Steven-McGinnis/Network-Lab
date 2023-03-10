@@ -67,6 +67,7 @@ public class Client {
             userInput = "FINDMATCH";
             outToServer.println(userInput);
             returned = inFromServer.readLine();
+            System.out.println(returned);
 
           case "2":
             userInput = "USERS";
