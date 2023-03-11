@@ -70,7 +70,18 @@ public class Server {
 
       int i = 0;
       while (i < clients.size()) {
-        if (processClientInput((Socket) clients.get(i).getSocket())) i++;
+        if (unNamedState(clients.get(i)));
+        i++;
+      }
+
+      i = 0;
+      while (i < clients.size()) {
+        if (namedState(clients.get(i))) i++;
+      }
+
+      i = 0;
+      while (i < games.size()) {
+        if (runGame(games.get(i))) i++;
       }
     } while (true);
 
@@ -81,83 +92,39 @@ public class Server {
     }
   }
 
-  private boolean processClientInput(Socket client) {
-    /*
-     * Returns true if the client connection is still okay
-     */
-
-    BufferedReader inFromClient = null;
-    PrintWriter outToClient = null;
-    String input = null;
-
-    try {
-      inFromClient =
-        new BufferedReader(new InputStreamReader(client.getInputStream()));
-      outToClient = new PrintWriter(client.getOutputStream(), true);
-    } catch (Exception e) {
-      // Find the User object associated with the disconnected client and remove it
-      for (int i = 0; i < clients.size(); i++) {
-        User u = clients.get(i);
-        if (u.getSocket() == client) {
-          clients.remove(i);
-          break;
-        }
-      }
-      return false;
-    }
-
-    try {
-      if (inFromClient.ready()) {
-        input = inFromClient.readLine();
-        String inputArray[] = input.split(" ", 2);
-        String output = "";
-
-        switch (inputArray[0]) {
-          case "IAM":
-            Boolean name = isNameTaken(inputArray[1]);
-            for (User user : clients) {
-              if (name == false) {
-                if (user.getSocket() == client) {
-                  user.setUsername(inputArray[1]);
-                  output = "NAMEOK";
-                  outToClient.println(output);
-                  break;
+  private boolean namedState(User user) {
+    int state = user.getStatus();
+    String input;
+    if (state == 1) {
+      BufferedReader inFromClient = getBufferedReader(user);
+      PrintWriter outToClient = getPrintWriter(user);
+      try {
+        if (inFromClient.ready()) {
+          input = inFromClient.readLine();
+          String inputArray[] = input.split(" ", 2);
+          switch (inputArray[0]) {
+            case "USERS":
+              String userList = "USERS\n";
+              for (User users : clients) {
+                String username = users.getUsername();
+                if (username != null) {
+                  userList += username + "\n";
                 }
-              } else {
-                output = "NAMEERROR";
-                outToClient.println(output);
               }
-            }
-            break;
-          case "USERS":
-            String userList = "USERS\n";
-            for (User user : clients) {
-              String username = user.getUsername();
-              if (username != null) {
-                userList += username + "\n";
-              }
-            }
-            userList += "--end--\n";
-            outToClient.println(userList);
-            break;
-          case "IAMGONE":
-            for (int i = 0; i < clients.size(); i++) {
-              User u = clients.get(i);
-              if (u.getSocket() == client) {
-                clients.remove(i);
-                break;
-              }
-            }
-            break;
-          case "FINDMATCH":
-            User user = null;
-            for (User u : clients) {
-              if (u.getSocket() == client) {
-                user = u;
-                break;
-              }
-            }
-            if (user != null) {
+              userList += "--end--\n";
+              outToClient.println(userList);
+              break;
+              /*
+               * 
+               */
+            case "IAMGONE":
+              clients.remove(user);
+              waitlist.remove(user);
+              break;
+              /*
+               * 
+               */
+            case "FINDMATCH":
               if (waitlist.size() > 0) {
                 // TODO: start game
                 User opponent = waitlist.get(0);
@@ -193,28 +160,22 @@ public class Server {
               } else {
                 waitlist.add(user);
               }
-            }
-            break;
+              break;
+          }
         }
+      } catch (Exception e) {
+        /*
+         * If we get an exception when communicating with a client,
+         * we should drop the client from the vector of clients, so
+         * we don't waste time processing the same client later.
+         *
+         */
+        removeClient(user.getSocket());
+        return false;
       }
-    } catch (Exception e) {
-      /*
-       * If we get an exception when communicating with a client,
-       * we should drop the client from the vector of clients, so
-       * we don't waste time processing the same client later.
-       *
-       */
-
-      for (int i = 0; i < clients.size(); i++) {
-        User u = clients.get(i);
-        if (u.getSocket() == client) {
-          clients.remove(i);
-          break;
-        }
-      }
-      return false;
+    } else {
+      return true;
     }
-
     return true;
   }
 
@@ -232,15 +193,15 @@ public class Server {
     return isTaken;
   }
 
-  private void runGame(TicTacToeBoard game) {
-    User player1 = game.getPlayer1();
-    User player2 = game.getPlayer2();
-    BufferedReader player1Input = null;
-    BufferedReader player2Input = null;
-    PrintWriter player1out = null;
-    PrintWriter player2out = null;
-    String input;
-    Boolean valid = false;
+  private Boolean runGame(TicTacToeBoard game) {
+    // User player1 = game.getPlayer1();
+    // User player2 = game.getPlayer2();
+    // BufferedReader player1Input = null;
+    // BufferedReader player2Input = null;
+    // PrintWriter player1out = null;
+    // PrintWriter player2out = null;
+    // String input;
+    // Boolean valid = false;
 
     // try {
     //   player1Input =
@@ -264,7 +225,108 @@ public class Server {
     // } catch (Exception e) {
     //   // TODO: handle exception
     // }
+    return true;
+  }
 
+  private Boolean unNamedState(User user) {
+    int state = user.getStatus();
+    String input;
+    if (state == 0) {
+      BufferedReader inFromClient = getBufferedReader(user);
+      PrintWriter outToClient = getPrintWriter(user);
 
+      try {
+        if (inFromClient.ready()) {
+          input = inFromClient.readLine();
+          String inputArray[] = input.split(" ", 2);
+          String output = "";
+
+          switch (inputArray[0]) {
+            case "IAM":
+              Boolean name = isNameTaken(inputArray[1]);
+              if (name == false) {
+                user.setUsername(inputArray[1]);
+                output = "NAMEOK";
+                user.setStatus(1);
+                outToClient.println(output);
+                break;
+              } else {
+                output = "NAMEERROR";
+                outToClient.println(output);
+              }
+              break;
+            case "USERS":
+              String userList = "USERS\n";
+              for (User users : clients) {
+                String username = users.getUsername();
+                if (username != null) {
+                  userList += username + "\n";
+                }
+              }
+              userList += "--end--\n";
+              outToClient.println(userList);
+              break;
+            case "IAMGONE":
+              clients.remove(user);
+              waitlist.remove(user);
+              break;
+          }
+        }
+      } catch (Exception e) {
+        /*
+         * If we get an exception when communicating with a client,
+         * we should drop the client from the vector of clients, so
+         * we don't waste time processing the same client later.
+         *
+         */
+        removeClient(user.getSocket());
+        return false;
+      }
+    } else {
+      return true;
+    }
+    return true;
+  }
+
+  private BufferedReader getBufferedReader(User user) {
+    BufferedReader inFromClient = null;
+    try {
+      inFromClient =
+        new BufferedReader(
+          new InputStreamReader(user.getSocket().getInputStream())
+        );
+    } catch (Exception e) {
+      // Find the User object associated with the disconnected client and remove it
+      removeClient(user.getSocket());
+    }
+    return inFromClient;
+  }
+
+  private PrintWriter getPrintWriter(User user) {
+    PrintWriter outToClient = null;
+    try {
+      outToClient = new PrintWriter(user.getSocket().getOutputStream(), true);
+    } catch (Exception e) {
+      // Find the User object associated with the disconnected client and remove it
+      removeClient(user.getSocket());
+    }
+    return outToClient;
+  }
+
+  public void removeClient(Socket socket) {
+    for (int i = 0; i < clients.size(); i++) {
+      User user = clients.get(i);
+      if (user.getSocket() == socket) {
+        clients.remove(i);
+        break;
+      }
+    }
+    for (int i = 0; i < waitlist.size(); i++) {
+      User u = waitlist.get(i);
+      if (u.getSocket() == socket) {
+        waitlist.remove(i);
+        break;
+      }
+    }
   }
 }

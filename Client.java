@@ -86,6 +86,7 @@ public class Client {
             userInput = "FINDMATCH";
             outToServer.println(userInput);
             System.out.println("You are in the wait queue");
+            
             returned = null;
             while (returned == null) {
               returned = inFromServer.readLine();
