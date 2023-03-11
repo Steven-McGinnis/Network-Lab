@@ -86,11 +86,12 @@ public class Client {
             userInput = "FINDMATCH";
             outToServer.println(userInput);
             System.out.println("You are in the wait queue");
-            
-            returned = null;
-            while (returned == null) {
-              returned = inFromServer.readLine();
+
+            returned = "";
+            while (!returned.endsWith("X") && !returned.endsWith("O")) {
+                returned += inFromServer.readLine();
             }
+            
             String result[] = returned.split(" ");
             System.out.println("Match Found,  Your Opponent is " + result[1]);
             System.out.println("You are playing the " + result[2] + "'s");

@@ -114,16 +114,16 @@ public class Server {
               userList += "--end--\n";
               outToClient.println(userList);
               break;
-              /*
-               * 
-               */
+            /*
+             *
+             */
             case "IAMGONE":
               clients.remove(user);
               waitlist.remove(user);
               break;
-              /*
-               * 
-               */
+            /*
+             *
+             */
             case "FINDMATCH":
               if (waitlist.size() > 0) {
                 // TODO: start game
@@ -156,7 +156,8 @@ public class Server {
                 opponentOut.println(gameResponse2);
                 TicTacToeBoard game = new TicTacToeBoard(user, opponent);
                 games.add(game);
-                runGame(game);
+                opponent.setStatus(3);
+                user.setStatus(3);
               } else {
                 waitlist.add(user);
               }
@@ -179,7 +180,7 @@ public class Server {
     return true;
   }
 
-  Boolean isNameTaken(String name) {
+  private Boolean isNameTaken(String name) {
     Boolean isTaken = false;
     if (clients.isEmpty()) {
       return false;
@@ -194,37 +195,65 @@ public class Server {
   }
 
   private Boolean runGame(TicTacToeBoard game) {
-    // User player1 = game.getPlayer1();
-    // User player2 = game.getPlayer2();
-    // BufferedReader player1Input = null;
-    // BufferedReader player2Input = null;
-    // PrintWriter player1out = null;
-    // PrintWriter player2out = null;
-    // String input;
-    // Boolean valid = false;
+    User player1 = game.getPlayer1();
+    User player2 = game.getPlayer2();
+    String input;
+    String output;
+    boolean isWinner = false;
+    boolean isDraw = false;
+    if (player1.getStatus() == 3 && player2.getStatus() == 3) {
+      BufferedReader inFromClientPlayer1 = getBufferedReader(player1);
+      PrintWriter outToClientPlayer1 = getPrintWriter(player1);
+      BufferedReader inFromClientPlayer2 = getBufferedReader(player2);
+      PrintWriter outToClientPlayer2 = getPrintWriter(player2);
+      try {
+        char piece = game.getActivePiece();
+        if(piece == player1.getPiece()){
+          output = "MOVE";
+          outToClientPlayer1.println(output);
+          input = inFromClientPlayer1.readLine();
+        } else {
+          output = "MOVE";
+          outToClientPlayer2.println(output);
+          input = inFromClientPlayer2.readLine();
+        }
 
-    // try {
-    //   player1Input =
-    //     new BufferedReader(
-    //       new InputStreamReader(player1.getSocket().getInputStream())
-    //     );
-    //   player2Input =
-    //     new BufferedReader(
-    //       new InputStreamReader(player2.getSocket().getInputStream())
-    //     );
-    //   player1out = new PrintWriter(player1.getSocket().getOutputStream(), true);
-    //   player2out = new PrintWriter(player2.getSocket().getOutputStream(), true);
-    // } catch (IOException e) {
-    //   e.printStackTrace();
-    // }
+        String resultedInput[] = input.split(" ", 2);
+        boolean valid = game.isMoveValid(resultedInput[1]);
+        if(valid){
+          game.makeMove(resultedInput[1]);
+          isWinner = game.checkWinner();
+          isDraw = game.checkDraw();
+          
+        } else {
+          output = "ERROR That is not a valid move.";
+          if(piece == player1.getPiece()){
+            outToClientPlayer1.println(output);
+          } else {
+            outToClientPlayer2.println(output);
+          } 
+        }
 
-    // try {
-    //   player1out.println("MOVE");
-    //   input = player1Input.readLine();
-    //   //valid = game.isMoveValid(input);
-    // } catch (Exception e) {
-    //   // TODO: handle exception
-    // }
+
+
+
+
+
+      } catch (Exception e) {
+        /*
+         * If we get an exception when communicating with a client,
+         * we should drop the client from the vector of clients, so
+         * we don't waste time processing the same client later.
+         *
+         */
+        // If an exception is thrown during gameplay, remove the game
+        games.remove(game);
+        System.err.println("Error during game: " + e.getMessage());
+        return false;
+      }
+    } else {
+      return true;
+    }
     return true;
   }
 
