@@ -20,103 +20,30 @@ public class TicTacToeBoard {
       }
     }
   
-    public boolean isGameOver() {
-      return getWinner() != null || isBoardFull();
+    public User getPlayer1(){
+        return player1;
     }
-  
-    public boolean isBoardFull() {
-      for (int i = 0; i < BOARD_SIZE; i++) {
-        for (int j = 0; j < BOARD_SIZE; j++) {
-          if (board[i][j] == ' ') {
+
+    public User getPlayer2(){
+        return player2;
+    }
+
+    public String getBoardState(){
+        String boardState = "MOVE ";
+        for (int i = 0; i < BOARD_SIZE; i++) {
+            for (int j = 0; j < BOARD_SIZE; j++) {
+                boardState = boardState + board[i][j];
+            }
+        }
+        return boardState;
+    }
+
+    public Boolean isMoveValid(int move){
+        int row = (move - 1) / BOARD_SIZE;
+        int col = (move - 1) % BOARD_SIZE;
+        if (move < 1 || move > BOARD_SIZE * BOARD_SIZE || board[row][col] != ' ') {
             return false;
-          }
-        }
-      }
-      return true;
-    }
-  
-    public User getWinner() {
-      return winner;
-    }
-  
-    public void setWinner(User winner) {
-      this.winner = winner;
-    }
-  
-    public boolean isValidMove(int row, int col) {
-      return row >= 0 && row < BOARD_SIZE && col >= 0 && col < BOARD_SIZE && board[row][col] == ' ';
-    }
-  
-    public boolean makeMove(User player, int row, int col) {
-      if (!isValidMove(row, col)) {
-        return false;
-      }
-  
-      char symbol = getSymbolForPlayer(player);
-      board[row][col] = symbol;
-  
-      if (hasPlayerWon(player)) {
-        setWinner(player);
-      }
-  
-      return true;
-    }
-  
-    public boolean hasPlayerWon(User player) {
-      char symbol = getSymbolForPlayer(player);
-  
-      // Check rows
-      for (int i = 0; i < BOARD_SIZE; i++) {
-        boolean hasWon = true;
-        for (int j = 0; j < BOARD_SIZE; j++) {
-          if (board[i][j] != symbol) {
-            hasWon = false;
-            break;
-          }
-        }
-        if (hasWon) {
-          return true;
-        }
-      }
-  
-      // Check columns
-      for (int i = 0; i < BOARD_SIZE; i++) {
-        boolean hasWon = true;
-        for (int j = 0; j < BOARD_SIZE; j++) {
-          if (board[j][i] != symbol) {
-            hasWon = false;
-            break;
-          }
-        }
-        if (hasWon) {
-          return true;
-        }
-      }
-  
-      // Check diagonals
-      boolean hasWon = true;
-      for (int i = 0; i < BOARD_SIZE; i++) {
-        if (board[i][i] != symbol) {
-          hasWon = false;
-          break;
-        }
-      }
-      if (hasWon) {
+        }    
         return true;
-      }
-  
-      hasWon = true;
-      for (int i = 0; i < BOARD_SIZE; i++) {
-        if (board[i][BOARD_SIZE - i - 1] != symbol) {
-          hasWon = false;
-          break;
-        }
-      }
-      if (hasWon) {
-        return true;
-      }
-  
-      return false;
     }
-  
 }

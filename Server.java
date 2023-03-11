@@ -165,18 +165,18 @@ public class Server {
                 user.setPiece('O');
                 opponent.setPiece('X');
 
-               // TicTacToeBoard game = new TicTacToeBoard(user, opponent);
+                // TicTacToeBoard game = new TicTacToeBoard(user, opponent);
                 String gameResponse1 =
                   "MATCHFOUND " +
                   opponent.getUsername() +
                   " " +
-                  opponent.getPiece();
+                  user.getPiece();
 
-                  String gameResponse2 =
+                String gameResponse2 =
                   "MATCHFOUND " +
                   user.getUsername() +
                   " " +
-                  user.getPiece();
+                  opponent.getPiece();
 
                 // send the message to the current client
                 outToClient.println(gameResponse1);
@@ -187,7 +187,9 @@ public class Server {
                   true
                 );
                 opponentOut.println(gameResponse2);
-                //TicTacToeBoard game = new TicTacToeBoard(user, opponent);
+                TicTacToeBoard game = new TicTacToeBoard(user, opponent);
+                games.add(game);
+                runGame(game);
               } else {
                 waitlist.add(user);
               }
@@ -228,5 +230,41 @@ public class Server {
       }
     }
     return isTaken;
+  }
+
+  private void runGame(TicTacToeBoard game) {
+    User player1 = game.getPlayer1();
+    User player2 = game.getPlayer2();
+    BufferedReader player1Input = null;
+    BufferedReader player2Input = null;
+    PrintWriter player1out = null;
+    PrintWriter player2out = null;
+    String input;
+    Boolean valid = false;
+
+    // try {
+    //   player1Input =
+    //     new BufferedReader(
+    //       new InputStreamReader(player1.getSocket().getInputStream())
+    //     );
+    //   player2Input =
+    //     new BufferedReader(
+    //       new InputStreamReader(player2.getSocket().getInputStream())
+    //     );
+    //   player1out = new PrintWriter(player1.getSocket().getOutputStream(), true);
+    //   player2out = new PrintWriter(player2.getSocket().getOutputStream(), true);
+    // } catch (IOException e) {
+    //   e.printStackTrace();
+    // }
+
+    // try {
+    //   player1out.println("MOVE");
+    //   input = player1Input.readLine();
+    //   //valid = game.isMoveValid(input);
+    // } catch (Exception e) {
+    //   // TODO: handle exception
+    // }
+
+
   }
 }
