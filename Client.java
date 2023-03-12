@@ -43,16 +43,11 @@ public class Client {
       if (status == 0) {
         System.out.println("What is your name?");
         userInput = stdIn.readLine();
-
-        if (userInput.equals("--end--") || userInput.equals("draw")) {
-          break;
-        }
-
         userInput = "IAM " + userInput;
         outToServer.println(userInput);
         String result = inFromServer.readLine();
         if (result.equals("NAMEERROR")) {
-          System.out.println("Im Sorry that name has already been taken.");
+          System.out.println("Im Sorry that name is not available.");
         } else if (result.equals("NAMEOK")) {
           status = 1;
           System.out.println("Name Accepted");
@@ -139,10 +134,10 @@ public class Client {
       } else if (status == 2) {
         inGame = true;
         cl.drawBoard(null);
-        
+
         while (inGame == true) {
           returned = null;
-          while(returned == null){
+          while (returned == null) {
             returned = inFromServer.readLine();
           }
 
@@ -154,7 +149,6 @@ public class Client {
               String move = "MOVE " + userInput;
               outToServer.println(move);
               break;
-
             case "ERROR":
               System.out.println(returnedCommand[1]);
               System.out.println("Please try again 1-9 on an empty space");
@@ -162,11 +156,9 @@ public class Client {
               move = "MOVE " + userInput;
               outToServer.println(move);
               break;
-
             case "UPDATE":
               cl.drawBoard(returnedCommand[1]);
               break;
-
             case "DONE":
               if (returnedCommand[1].equals("draw")) {
                 System.out.println("The Game Ended in a Tie.");
@@ -176,7 +168,6 @@ public class Client {
               inGame = false;
               status = 1;
               break;
-
             case "MATCHABORTED":
               System.out.println("Your Opponent has forfeit you win.");
               inGame = false;
@@ -215,27 +206,27 @@ public class Client {
       int index = 0;
       String board =
         "  " +
-        spaces[index++] +
+        String.valueOf(spaces[index++]).replace('-', '1') +
         " | " +
-        spaces[index++] +
+        String.valueOf(spaces[index++]).replace('-', '2') +
         " | " +
-        spaces[index++] +
+        String.valueOf(spaces[index++]).replace('-', '3') +
         " \n" +
         "  ---------\n" +
         "  " +
-        spaces[index++] +
+        String.valueOf(spaces[index++]).replace('-', '4') +
         " | " +
-        spaces[index++] +
+        String.valueOf(spaces[index++]).replace('-', '5') +
         " | " +
-        spaces[index++] +
+        String.valueOf(spaces[index++]).replace('-', '6') +
         " \n" +
         "  ---------\n" +
         "  " +
-        spaces[index++] +
+        String.valueOf(spaces[index++]).replace('-', '7') +
         " | " +
-        spaces[index++] +
+        String.valueOf(spaces[index++]).replace('-', '8') +
         " | " +
-        spaces[index++] +
+        String.valueOf(spaces[index++]).replace('-', '9') +
         " \n";
       System.out.println(board);
     }

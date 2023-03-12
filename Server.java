@@ -201,12 +201,13 @@ public class Server {
     User currentPlayer;
     boolean isWinner = false;
     boolean isDraw = false;
+    BufferedReader inFromClientPlayer1 = getBufferedReader(player1);
+    PrintWriter outToClientPlayer1 = getPrintWriter(player1);
+    BufferedReader inFromClientPlayer2 = getBufferedReader(player2);
+    PrintWriter outToClientPlayer2 = getPrintWriter(player2);
 
     if (player1.getStatus() == 3 && player2.getStatus() == 3) {
-      BufferedReader inFromClientPlayer1 = getBufferedReader(player1);
-      PrintWriter outToClientPlayer1 = getPrintWriter(player1);
-      BufferedReader inFromClientPlayer2 = getBufferedReader(player2);
-      PrintWriter outToClientPlayer2 = getPrintWriter(player2);
+
       try {
         char piece = game.getActivePiece();
         String input = null;
@@ -260,6 +261,8 @@ public class Server {
                     output = "DONE draw";
                     outToClientPlayer1.println(output);
                     outToClientPlayer2.println(output);
+                    player1.setStatus(1);
+                    player2.setStatus(1);
                   } else {
                     game.changePlayer();
                     output = "UPDATE " + game.updateBoard();
@@ -288,6 +291,11 @@ public class Server {
          */
         // If an exception is thrown during gameplay, remove the game
         games.remove(game);
+        player1.setStatus(1);
+        player2.setStatus(1);
+        String output = "MATCHABORTED";
+        outToClientPlayer1.println(output);
+        outToClientPlayer2.println(output);
         System.err.println("Error during game: " + e.getMessage());
         return false;
       }
@@ -312,8 +320,9 @@ public class Server {
 
           switch (inputArray[0]) {
             case "IAM":
-              Boolean name = isNameTaken(inputArray[1]);
-              if (name == false) {
+              Boolean nameAllowed = isNameAllowed(inputArray[1]);
+              Boolean nameTaken = isNameTaken(inputArray[1]);
+              if (nameTaken == false && nameAllowed == true) {
                 user.setUsername(inputArray[1]);
                 output = "NAMEOK";
                 user.setStatus(1);
@@ -353,6 +362,13 @@ public class Server {
       }
     } else {
       return true;
+    }
+    return true;
+  }
+
+  private Boolean isNameAllowed(String string) {
+    if(string.equals("") || string.equals("--end--") || string.equals("draw")){
+      return false;
     }
     return true;
   }
