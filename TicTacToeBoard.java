@@ -5,6 +5,7 @@ public class TicTacToeBoard {
   private User player2;
   private char[][] board;
   private char currentPiece = 'X';
+  private int gameState = 0;
 
   public TicTacToeBoard(User player1, User player2) {
     this.player1 = player1;
@@ -29,6 +30,14 @@ public class TicTacToeBoard {
 
   public char getActivePiece() {
     return currentPiece;
+  }
+
+  public void setGameState(int state){
+    this.gameState = state;
+  }
+
+  public int getGameState() {
+    return this.gameState;
   }
 
   public String getBoardState() {

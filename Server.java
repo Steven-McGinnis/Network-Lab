@@ -197,6 +197,7 @@ public class Server {
   private Boolean runGame(TicTacToeBoard game) {
     User player1 = game.getPlayer1();
     User player2 = game.getPlayer2();
+    int gameState = game.getGameState();
     User currentPlayer;
     boolean isWinner = false;
     boolean isDraw = false;
@@ -210,61 +211,72 @@ public class Server {
         char piece = game.getActivePiece();
         String input = null;
         String output;
-        // if (inFromClientPlayer1.ready() || inFromClientPlayer2.ready()) {
 
         if (piece == player1.getPiece()) {
           currentPlayer = player1;
-          output = "MOVE";
-          outToClientPlayer1.println(output);
-          if (inFromClientPlayer1.ready()) {
-            input = inFromClientPlayer1.readLine();
-          }
         } else {
           currentPlayer = player2;
-          output = "MOVE";
-          outToClientPlayer2.println(output);
-          if (inFromClientPlayer2.ready()) {
-            input = inFromClientPlayer2.readLine();
+        }
+
+        if (gameState == 0) {
+          if (piece == player1.getPiece()) {
+            currentPlayer = player1;
+            output = "MOVE";
+            outToClientPlayer1.println(output);
+            game.setGameState(1);
+          } else {
+            currentPlayer = player2;
+            output = "MOVE";
+            outToClientPlayer2.println(output);
+            game.setGameState(1);
           }
         }
 
-        if (input != null) {
-          String resultedInput[] = input.split(" ", 2);
-          switch (resultedInput[0]) {
-            case "MOVE":
-            System.out.println(resultedInput[1]);
-              boolean valid = game.isMoveValid(resultedInput[1]);
-              if (valid == true) {
-                game.makeMove(resultedInput[1]);
-                isWinner = game.checkWinner();
-                isDraw = game.checkDraw();
-                if (isWinner == true) {
-                  output = "DONE " + currentPlayer.getUsername();
-                  outToClientPlayer1.println(output);
-                  outToClientPlayer2.println(output);
-                  player1.setStatus(1);
-                  player2.setStatus(1);
-                  games.remove(game);
-                } else if (isDraw == true) {
-                  output = "DONE draw";
-                  outToClientPlayer1.println(output);
-                  outToClientPlayer2.println(output);
+        if (gameState == 1) {
+          if (inFromClientPlayer1.ready()) {
+            input = inFromClientPlayer1.readLine();
+          }
+          if (inFromClientPlayer2.ready()) {
+            input = inFromClientPlayer2.readLine();
+          }
+
+          if (input != null) {
+            String resultedInput[] = input.split(" ", 2);
+            switch (resultedInput[0]) {
+              case "MOVE":
+                boolean valid = game.isMoveValid(resultedInput[1]);
+                if (valid == true) {
+                  game.makeMove(resultedInput[1]);
+                  isWinner = game.checkWinner();
+                  isDraw = game.checkDraw();
+                  if (isWinner == true) {
+                    output = "DONE " + currentPlayer.getUsername();
+                    outToClientPlayer1.println(output);
+                    outToClientPlayer2.println(output);
+                    player1.setStatus(1);
+                    player2.setStatus(1);
+                    games.remove(game);
+                  } else if (isDraw == true) {
+                    output = "DONE draw";
+                    outToClientPlayer1.println(output);
+                    outToClientPlayer2.println(output);
+                  } else {
+                    game.changePlayer();
+                    output = "UPDATE " + game.updateBoard();
+                    outToClientPlayer1.println(output);
+                    outToClientPlayer2.println(output);
+                    game.setGameState(0);
+                  }
                 } else {
-                  game.changePlayer();
-                  output = "UPDATE " + game.updateBoard();
-                  outToClientPlayer1.println(output);
-                  outToClientPlayer2.println(output);
+                  output = "ERROR That is not a valid move.";
+                  if (piece == player1.getPiece()) {
+                    outToClientPlayer1.println(output);
+                  } else {
+                    outToClientPlayer2.println(output);
+                  }
                 }
-              } else {
-                
-                output = "ERROR That is not a valid move.";
-                if (piece == player1.getPiece()) {
-                  outToClientPlayer1.println(output);
-                } else {
-                  outToClientPlayer2.println(output);
-                }
-              }
-              break;
+                break;
+            }
           }
         }
       } catch (Exception e) {

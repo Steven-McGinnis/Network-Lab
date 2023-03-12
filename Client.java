@@ -147,22 +147,20 @@ public class Client {
           }
 
           String returnedCommand[] = returned.split(" ", 2);
-          System.out.println(returnedCommand[0]);
           switch (returnedCommand[0]) {
             case "MOVE":
-
               System.out.println("Please make your move 1-9");
               userInput = stdIn.readLine();
               String move = "MOVE " + userInput;
               outToServer.println(move);
-              inFromServer.readLine();
               break;
 
             case "ERROR":
               System.out.println(returnedCommand[1]);
               System.out.println("Please try again 1-9 on an empty space");
               userInput = stdIn.readLine();
-              outToServer.println(userInput);
+              move = "MOVE " + userInput;
+              outToServer.println(move);
               break;
 
             case "UPDATE":
