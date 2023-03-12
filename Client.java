@@ -89,9 +89,9 @@ public class Client {
 
             returned = "";
             while (!returned.endsWith("X") && !returned.endsWith("O")) {
-                returned += inFromServer.readLine();
+              returned += inFromServer.readLine();
             }
-            
+
             String result[] = returned.split(" ");
             System.out.println("Match Found,  Your Opponent is " + result[1]);
             System.out.println("You are playing the " + result[2] + "'s");
@@ -139,38 +139,51 @@ public class Client {
       } else if (status == 2) {
         inGame = true;
         cl.drawBoard(null);
+        
         while (inGame == true) {
-          returned = inFromServer.readLine();
+          returned = null;
+          while(returned == null){
+            returned = inFromServer.readLine();
+          }
+
           String returnedCommand[] = returned.split(" ", 2);
+          System.out.println(returnedCommand[0]);
           switch (returnedCommand[0]) {
             case "MOVE":
+
               System.out.println("Please make your move 1-9");
               userInput = stdIn.readLine();
-              outToServer.println(userInput);
+              String move = "MOVE " + userInput;
+              outToServer.println(move);
+              inFromServer.readLine();
               break;
+
             case "ERROR":
               System.out.println(returnedCommand[1]);
               System.out.println("Please try again 1-9 on an empty space");
               userInput = stdIn.readLine();
               outToServer.println(userInput);
               break;
+
             case "UPDATE":
               cl.drawBoard(returnedCommand[1]);
-            break;
+              break;
+
             case "DONE":
               if (returnedCommand[1].equals("draw")) {
                 System.out.println("The Game Ended in a Tie.");
-              }else{
+              } else {
                 System.out.println("The Winner is " + returnedCommand[1]);
               }
               inGame = false;
               status = 1;
-            break;
+              break;
+
             case "MATCHABORTED":
               System.out.println("Your Opponent has forfeit you win.");
               inGame = false;
               status = 1;
-            break;
+              break;
           }
         }
       }
@@ -199,6 +212,34 @@ public class Client {
         "  ---------\n" +
         "  7 | 8 | 9 \n";
       System.out.println(emptyBoard);
-    } else {}
+    } else {
+      char spaces[] = move.toCharArray();
+      int index = 0;
+      String board =
+        "  " +
+        spaces[index++] +
+        " | " +
+        spaces[index++] +
+        " | " +
+        spaces[index++] +
+        " \n" +
+        "  ---------\n" +
+        "  " +
+        spaces[index++] +
+        " | " +
+        spaces[index++] +
+        " | " +
+        spaces[index++] +
+        " \n" +
+        "  ---------\n" +
+        "  " +
+        spaces[index++] +
+        " | " +
+        spaces[index++] +
+        " | " +
+        spaces[index++] +
+        " \n";
+      System.out.println(board);
+    }
   }
 }

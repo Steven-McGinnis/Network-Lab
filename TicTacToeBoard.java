@@ -4,14 +4,12 @@ public class TicTacToeBoard {
   private User player1;
   private User player2;
   private char[][] board;
-  private User winner;
   private char currentPiece = 'X';
 
   public TicTacToeBoard(User player1, User player2) {
     this.player1 = player1;
     this.player2 = player2;
     this.board = new char[BOARD_SIZE][BOARD_SIZE];
-    this.winner = null;
 
     // Initialize the board with empty spaces
     for (int i = 0; i < BOARD_SIZE; i++) {
@@ -134,4 +132,28 @@ public class TicTacToeBoard {
     // All spaces are filled, game is a draw
     return true;
   }
+
+public void changePlayer() {
+    if(currentPiece == 'X'){
+        currentPiece = 'O';
+    }else{
+        currentPiece = 'X';
+    }
+}
+
+public String updateBoard() {
+    StringBuilder boardState = new StringBuilder();
+    for (int i = 0; i < BOARD_SIZE; i++) {
+        for (int j = 0; j < BOARD_SIZE; j++) {
+            if (board[i][j] == ' ') {
+                boardState.append("-");
+            } else {
+                boardState.append(board[i][j]);
+            }
+        }
+    }
+    return boardState.toString();
+}
+
+
 }
